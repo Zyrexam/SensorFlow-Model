@@ -2,7 +2,7 @@ import os
 
 import keras
 from keras import layers
-from dataset import get_dataset
+from sensorflow_model.dataset import get_dataset
 from sklearn.model_selection import train_test_split
 
 
@@ -15,10 +15,10 @@ def load_model():
     model = keras.Sequential([
         keras.Input(shape=(200, 12)),  # 2s window with 12 features
         
-        layers.Conv1D(64, kernel_size=5, activation='relu'),
+        layers.Conv1D(64, kernel_size=5, activation='relu', padding='same'),
         layers.MaxPooling1D(pool_size=2),
         
-        layers.Conv1D(128, kernel_size=3, activation='relu'),
+        layers.Conv1D(128, kernel_size=3, activation='relu', padding='same'),
         layers.MaxPooling1D(pool_size=2),
         
         layers.LSTM(64),
@@ -60,7 +60,8 @@ def load_data(partition_id, data_folder="Data"):
     filepath = os.path.join(data_folder, all_files[partition_id])
 
     
-    X, y = get_dataset(filepath, window_size=200, stride=100)
+    X, y= get_dataset(filepath, window_size=200, stride=100)
+    
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     return x_train, y_train, x_test, y_test
@@ -74,8 +75,3 @@ def export_to_tflite(model, output_path="model.tflite"):
     tflite_model = converter.convert()
     with open(output_path, "wb") as f:
         f.write(tflite_model) # type: ignore
-
-
-
-
-

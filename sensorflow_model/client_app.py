@@ -1,7 +1,7 @@
 from flwr.client import NumPyClient, ClientApp
 from flwr.common import Context
 
-from task import load_data, load_model, get_parameters, set_parameters
+from sensorflow_model.task import load_data, load_model, get_parameters, set_parameters
 
 
 class FlowerClient(NumPyClient):

@@ -2,7 +2,7 @@ from flwr.common import Context, ndarrays_to_parameters, Scalar
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.server.strategy import FedAvg
 
-from task import load_model 
+from sensorflow_model.task import load_model
 
 
 def weighted_average(metrics) -> dict[str, Scalar]:
