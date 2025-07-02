@@ -24,8 +24,8 @@ serverapp = "sensorflow_model.server_app:app"
 clientapp = "sensorflow_model.client_app:app"
 
 [tool.flwr.app.config]
-num-server-rounds = 5
-local-epochs = 1
+num-server-rounds = 20
+local-epochs = 5
 batch-size = 32
 verbose = false
 
