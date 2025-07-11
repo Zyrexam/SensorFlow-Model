@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import json
-import keras
+from tensorflow import keras
 from keras import layers, models, regularizers
 from sensorflow_model.dataset import get_dataset, normalize_features
 from sklearn.model_selection import train_test_split
@@ -53,10 +53,10 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 #     return model
 
-# # CNN + BiLSTM
+
 def load_model():
     model = keras.Sequential([
-        keras.Input(shape=(200, 12)),
+        keras.Input(shape=(20, 12)), 
 
         layers.Conv1D(64, 5, activation='relu', padding='same'),
         layers.BatchNormalization(),
@@ -89,7 +89,6 @@ def load_model():
         metrics=['accuracy'])
     return model
 
-
 def get_parameters(model):
     return model.get_weights()
 
@@ -98,81 +97,7 @@ def set_parameters(model, parameters):
     model.set_weights(parameters)
 
 
-
-
-
-
-# def load_data(partition_id, data_folder="Data"):
-#     all_files = sorted([f for f in os.listdir(data_folder) if f.endswith(".csv")])
-    
-#     if len(all_files) == 0:
-#         raise ValueError("No CSV files found in the data folder!")
-
-#     # Safely get file by partition index
-#     if partition_id >= len(all_files):
-#         raise IndexError(f"Only {len(all_files)} CSV files found. Partition ID {partition_id} is out of range.")
-
-#     filepath = os.path.join(data_folder, all_files[partition_id])
-
-    
-#     X, y= get_dataset(filepath, window_size=200, stride=100)
-    
-#     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-#     export_feature_stats(x_train)
-#     return x_train, y_train, x_test, y_test
-
-
-
-# def load_data(partition_id, data_folder="Data"):
-    
-#     all_files = sorted([f for f in os.listdir(data_folder) if f.endswith(".csv")])
-    
-#     if len(all_files) == 0:
-#         raise ValueError("No CSV files found in the data folder!")
-
-#     if partition_id >= len(all_files):
-#         raise IndexError(f"Only {len(all_files)} CSV files found. Partition ID {partition_id} is out of range.")
-
-#     filepath = os.path.join(data_folder, all_files[partition_id])
-
-#     # Load windowed data
-#     X, y = get_dataset(filepath, window_size=200, stride=100)
-
-#     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-#     x_train, scaler = normalize_features(x_train)
-
-#     x_test = scaler.transform(x_test.reshape(-1, x_test.shape[-1])).reshape(x_test.shape)
-
-#     return x_train, y_train, x_test, y_test
-
-
-# def load_data(partition_id, data_folder="Data"):
-#     client_folder = os.path.join(data_folder, f"Client_{partition_id + 1}")
-#     all_files = sorted([f for f in os.listdir(client_folder) if f.endswith(".csv")])
-    
-#     if not all_files:
-#         raise ValueError(f"No CSV files found in folder {client_folder}")
-    
-#     X_total, y_total = [], []
-
-#     for file in all_files:
-#         filepath = os.path.join(client_folder, file)
-#         X, y = get_dataset(filepath, window_size=20, stride=5)
-#         X_total.append(X)
-#         y_total.append(y)
-
-#     X = np.concatenate(X_total, axis=0)
-#     y = np.concatenate(y_total, axis=0)
-
-#     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-#     x_train, scaler = normalize_features(x_train)
-#     x_test = scaler.transform(x_test.reshape(-1, x_test.shape[-1])).reshape(x_test.shape)
-
-#     return x_train, y_train, x_test, y_test
-
-
-def load_data(partition_id, data_folder="Data"):
+def load_data(partition_id, data_folder="myData"):
     client_folder = os.path.join(data_folder, f"Client_{partition_id + 1}")
     all_files = sorted([f for f in os.listdir(client_folder) if f.endswith(".csv")])
     

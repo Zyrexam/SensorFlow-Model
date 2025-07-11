@@ -22,7 +22,9 @@ class FlowerClient(NumPyClient):
             verbose=self.verbose,
         )
         return get_parameters(self.model), len(self.x_train), {}
-
+    
+    
+    
     def evaluate(self, parameters, config):
         set_parameters(self.model, parameters)
         loss, accuracy = self.model.evaluate(self.x_test, self.y_test, verbose=0)
@@ -52,3 +54,26 @@ def client_fn(context: Context):
 app = ClientApp(
     client_fn=client_fn,
 )
+
+    # def fit(self, parameters, config):
+    #     set_parameters(self.model, parameters)
+
+    #     history = self.model.fit(
+    #         self.x_train,
+    #         self.y_train,
+    #         validation_data=(self.x_test, self.y_test),
+    #         epochs=self.epochs,
+    #         batch_size=self.batch_size,
+    #         verbose=self.verbose,
+    #     )
+
+    #     # Extract last epoch metrics
+    #     metrics = {
+    #         "train_loss": float(history.history["loss"][-1]),
+    #         "train_accuracy": float(history.history["accuracy"][-1]),
+    #         "val_loss": float(history.history["val_loss"][-1]),
+    #         "val_accuracy": float(history.history["val_accuracy"][-1]),
+    #     }
+
+    #     return get_parameters(self.model), len(self.x_train), metrics
+
