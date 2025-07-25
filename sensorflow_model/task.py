@@ -1,6 +1,7 @@
 import os
-import numpy as np
 import json
+import numpy as np
+import tensorflow as tf
 from tensorflow import keras
 from keras import layers, models, regularizers
 from sensorflow_model.dataset import get_dataset, normalize_features
@@ -10,8 +11,7 @@ from sklearn.model_selection import train_test_split
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-import tensorflow as tf
-from tensorflow.keras import layers
+
 
 # class GatedSensorFusion(layers.Layer):
 #     def __init__(self, conv_channels):
@@ -99,9 +99,6 @@ from tensorflow.keras import layers
 
 #     return x_train, y_train, x_test, y_test
 
-from tensorflow import keras
-from keras import layers, regularizers
-
 class GatedSensorFusion(layers.Layer):
     def __init__(self, conv_channels):
         super(GatedSensorFusion, self).__init__()
@@ -114,52 +111,117 @@ class GatedSensorFusion(layers.Layer):
         fused = gate * x1 + (1 - gate) * x2
         return self.proj(fused)
 
-def load_model():
-    # Two inputs: one for each sensor modality
-    input_watch = keras.Input(shape=(20, 6), name='watch_input')
-    input_ear = keras.Input(shape=(20, 6), name='earable_input')
 
-    # Shared Conv blocks for both branches
-    def conv_block(x):
-        x = layers.Conv1D(64, 5, activation='relu', padding='same')(x)
-        x = layers.BatchNormalization()(x)
-        x = layers.MaxPooling1D(2)(x)
-        x = layers.Dropout(0.2)(x)
+# clusterFL
+# def load_model():
+#     # Two inputs: watch and earable
+#     input_watch = keras.Input(shape=(20, 6), name='watch_input')
+#     input_ear = keras.Input(shape=(20, 6), name='earable_input')
 
-        x = layers.Conv1D(128, 3, activation='relu', padding='same')(x)
-        x = layers.BatchNormalization()(x)
-        x = layers.MaxPooling1D(2)(x)
-        x = layers.Dropout(0.3)(x)
+#     # Shared Conv1D feature extractor
+#     def conv_block(x):
+#         x = layers.Conv1D(64, 5, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.2)(x)
 
-        x = layers.Conv1D(256, 3, activation='relu', padding='same')(x)
-        x = layers.BatchNormalization()(x)
-        x = layers.MaxPooling1D(2)(x)
-        x = layers.Dropout(0.3)(x)
-        return x
+#         x = layers.Conv1D(128, 3, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.3)(x)
 
-    # Feature extraction
-    x_watch = conv_block(input_watch)
-    x_ear = conv_block(input_ear)
+#         x = layers.Conv1D(256, 3, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.3)(x)
+#         return x
 
-    # Gated Fusion
-    fused = GatedSensorFusion(conv_channels=256)(x_watch, x_ear)
+#     # Apply conv block
+#     x_watch = conv_block(input_watch)
+#     x_ear = conv_block(input_ear)
 
-    # BiLSTM and classification head
-    x = layers.Bidirectional(layers.LSTM(64))(fused)
-    x = layers.Dropout(0.4)(x)
-    x = layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(1e-4))(x)
-    x = layers.Dropout(0.5)(x)
-    output = layers.Dense(12, activation='softmax')(x)
+#     # Concatenate features
+#     fused = layers.Concatenate()([x_watch, x_ear])
 
-    model = keras.Model(inputs=[input_watch, input_ear], outputs=output)
+#     # Flatten
+#     flat = layers.Flatten()(fused)
 
-    model.compile(
-        optimizer='adam',
-        loss='sparse_categorical_crossentropy',
-        metrics=['accuracy']
-    )
+#     # FC1 layer (match old model: 300 units + relu)
+#     fc1 = layers.Dense(300, activation='relu')(flat)
 
-    return model
+#     # Dropout (match old keep_prob=0.5)
+#     fc1 = layers.Dropout(0.5)(fc1)
+
+#     # FC2 → logits
+#     logits = layers.Dense(12, activation=None)(fc1)
+
+#     # Softmax output
+#     output = layers.Activation('softmax')(logits)
+
+#     model = keras.Model(inputs=[input_watch, input_ear], outputs=output)
+
+#     # Compile
+#     model.compile(
+#         optimizer='adam',
+#         loss='sparse_categorical_crossentropy',
+#         metrics=['accuracy']
+#     )
+
+#     return model
+
+
+
+# cnn+bilstm
+# def load_model():
+#     # Two inputs: one for each sensor modality
+#     input_watch = keras.Input(shape=(20, 6), name='watch_input')
+#     input_ear = keras.Input(shape=(20, 6), name='earable_input')
+
+#     # Shared Conv blocks for both branches
+#     def conv_block(x):
+#         x = layers.Conv1D(64, 5, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.2)(x)
+
+#         x = layers.Conv1D(128, 3, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.3)(x)
+
+#         x = layers.Conv1D(256, 3, activation='relu', padding='same')(x)
+#         x = layers.BatchNormalization()(x)
+#         x = layers.MaxPooling1D(2)(x)
+#         x = layers.Dropout(0.3)(x)
+#         return x
+
+#     # Feature extraction
+#     x_watch = conv_block(input_watch)
+#     x_ear = conv_block(input_ear)
+
+#     # Gated Fusion
+#     fused = GatedSensorFusion(conv_channels=256)(x_watch, x_ear)
+
+#     # BiLSTM and classification head
+#     x = layers.Bidirectional(layers.LSTM(64))(fused)
+#     x = layers.Dropout(0.4)(x)
+#     x = layers.Dense(64, activation='relu', kernel_regularizer=regularizers.l2(1e-4))(x)
+#     x = layers.Dropout(0.5)(x)
+#     output = layers.Dense(12, activation='softmax')(x)
+
+#     model = keras.Model(inputs=[input_watch, input_ear], outputs=output)
+
+#     model.compile(
+#         optimizer='adam',
+#         loss='sparse_categorical_crossentropy',
+#         metrics=['accuracy']
+#     )
+
+#     return model
+
+
+
+
 
 def get_parameters(model):
     return model.get_weights()

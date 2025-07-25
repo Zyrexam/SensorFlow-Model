@@ -390,6 +390,9 @@
 
 # #     except Exception as e:
 # #         print(f"⚠️ Could not generate convergence plot: {e}")
+
+
+
 import os
 os.environ["RAY_DISABLE_DASHBOARD"] = "1"
 
@@ -399,9 +402,10 @@ import matplotlib.pyplot as plt
 from flwr.common import Context, ndarrays_to_parameters, parameters_to_ndarrays, Scalar
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from typing import Dict
-#import matplotlib.pyplot as plt
-from flwr.server.strategy import FedAvg
+
+from flwr.server.strategy import FedAvg, FedAvgM
 from sensorflow_model.personalize import evaluate_personalization_on_clients
+
 from sensorflow_model.task import (
     load_model,
     get_parameters,
@@ -500,6 +504,7 @@ class SaveFedAvg(FedAvg):
             self.plot_convergence()
 
         return aggregated_parameters, aggregated_metrics
+
 
     def aggregate_fit_metrics(self, results):
         if not results:
