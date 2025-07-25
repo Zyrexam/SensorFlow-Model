@@ -5,6 +5,15 @@ __pycache__/
 
 # Flower directory
 .flwr
+**/mohit_flwr
+**/mohit_flwr.pub
+
+# .gitignore
+# Ignore all SSH keys, both private and public
+mohit_flwr
+mohit_flwr.pub
+*.key
+*.pem
 
 # C extensions
 *.so

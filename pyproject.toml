@@ -24,7 +24,7 @@ serverapp = "sensorflow_model.server_app:app"
 clientapp = "sensorflow_model.client_app:app"
 
 [tool.flwr.app.config]
-num-server-rounds = 20
+num-server-rounds = 40
 local-epochs = 5
 batch-size = 64
 verbose = false
@@ -34,4 +34,4 @@ verbose = false
 default = "local-simulation"
 
 [tool.flwr.federations.local-simulation]
-options.num-supernodes = 6
+options.num-supernodes = 6 

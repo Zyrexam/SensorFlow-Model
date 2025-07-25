@@ -53,7 +53,9 @@ def load_csv(filepath):
 #     return X_scaled.reshape(original_shape), scaler
   
   
-  
+
+
+
 #   for less normalizatone times
 def normalize_features(X, save=False, path="normalization.json"):
     """
@@ -70,7 +72,7 @@ def normalize_features(X, save=False, path="normalization.json"):
         std = scaler.scale_.tolist() if scaler.scale_ is not None else []
         with open(path, "w") as f:
             json.dump({"mean": mean, "std": std}, f)
-        print(f"Saved normalization stats to {path}")
+        #print(f"Saved normalization stats to {path}")
 
     return X_scaled.reshape(original_shape), scaler
 
